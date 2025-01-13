@@ -30,12 +30,12 @@ subplot(3,1,2);
 semilogx(freq, 20*log10(abs(Z_total)), 'r', 'LineWidth', 1.5);
 xlabel('Frequency [Hz]');
 ylabel('Magnitude [dB]');
-title('Bode Plot: Magnitude (Simplified Randles Cell)');
+title('Bode Plot: Magnitude (Warberg Randles Cell)');
 grid on;
 
 subplot(3,1,3);
 semilogx(freq, rad2deg(angle(Z_total)), 'r', 'LineWidth', 1.5);
 xlabel('Frequency [Hz]');
 ylabel('Phase [Degrees]');
-title('Bode Plot: Phase (Simplified Randles Cell)');
+title('Bode Plot: Phase (Warberg Randles Cell)');
 grid on;

@@ -9,9 +9,9 @@ Cdl_true = 40e-6;
 sigma_true = 150;
 
 % Initial guess
-initial_guess = [10, 150, 20e-6, 10];  % [Rs, Rp, Cdl, sigma]
+initial_guess = [10, 150, 20e-6, 100];  % [Rs, Rp, Cdl, sigma]
 
-freq = logspace(-1, 4, 500);
+freq = logspace(-1, 4, 10);
 omega = 2 * pi * freq;
 
 Z_Rs = Rs_true;                    % electrolyte resistance (Rs)

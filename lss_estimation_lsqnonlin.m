@@ -11,7 +11,7 @@ sigma_true = 150;
 % Initial guess
 initial_guess = [10, 150, 20e-6, 100];  % [Rs, Rp, Cdl, sigma]
 
-freq = logspace(-1, 4, 500);
+freq = logspace(-1, 4, 10);
 omega = 2 * pi * freq;
 
 
