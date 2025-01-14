@@ -31,13 +31,19 @@ We also explore practical considerations of implementing Nelder-Mead, and data r
 Reference : https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Randles_circuit.png/220px-Randles_circuit.png  
 <img src="media/Randles_circuit.png" width="500"/>  
 The Warburg infinite impedance (\( Z_W \)) is given by the equation:  
-$$  
-Z_W = \sigma \omega^{-1/2} (1 - j)  
-$$  
-Where:  
-- \( \sigma \) is the Warburg coefficient.  
-- \( \omega \) is the angular frequency, \( \omega = 2 \pi f \).  
-- \( f \) is the frequency.  
+The Warburg infinite impedance (Z_W) is given by the equation:
+
+$$
+Z_W = \sigma \omega^{-1/2} (1 - j)
+$$
+
+Where:
+- \( \sigma \) is the Warburg coefficient.
+- \( \omega \) is the angular frequency, \( \omega = 2 \pi f \).
+- \( f \) is the frequency.
+
+Real-life simulations use a finite Warburg impedance that depends on the geometry of the cell and other factors. For our purposes, the infinite model is enough as we are not aiming to create a very accurate model, but rather focus on estimating the parameters of the model we choose, and the optimization itself.
+
 Real life simulation uses warberg finite impedance and depends on the geommetry of the cell and other factors. For our purposes, the infinite model is enough as we are not aiming to create a very accurate model, but rather focus on estimating the parameters of the model we choose, and the optimization itself.  
 
 ## Modelled Parameters and Physical Interpretation  
