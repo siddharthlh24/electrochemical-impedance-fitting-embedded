@@ -61,6 +61,7 @@ float objectiveFunction(float *params) {
     calculateImpedance(Rs, Rp, Cdl, sigma, Z_model);
 
     float residual = 0.0;
+    // Sweep over muliple frequencies for diversity
     for (int i = 0; i < num_points; i++) {
         float real_residual = Z_real_noisy[i] - Z_model[i].real();
         float imag_residual = Z_imag_noisy[i] - Z_model[i].imag();

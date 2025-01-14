@@ -10,20 +10,21 @@
 - [Matlab Impedance Simulation](#matlab-simulation)
 - [Cell Parameter Estimation](#cell-parameter-estimation)
 - [Embedded Platform Implementation](#embedded-platform-implementation)
-- [Acknowledgments](#acknowledgments)
+- [Practical Consideration for optimization : Important ](#Practical-Considerations-for-Nelder-Mead)
+- [Acknowledgments and Notes](#Acknowledgments-and-Notes)
 
 ---
 
 ## Aim
 This project uses Electrochemical Impedance Spectroscopy (EIS) with the Randles Cell Model (including Warburg impedance) to estimate cell parameters through Least Squares Estimation. The goal is to identify circuit components affecting impedance, aiding in the assessment of cell aging and degradation.
-
 The estimation process is embedded on an ESP32 microcontroller using the Nelder-Mead optimization method. By performing real-time optimization on the edge, the system provides efficient, on-site monitoring of cell health and performance without the need for external computation. The embedded results are compared with simulated data to evaluate accuracy and performance.
 
 ---
 
 ## Description
-We simulate Electrochemical Impedance Spectroscopy (EIS) for a cell using the **Randles Cell Model**, and extend it to include the **Randle Cell Model with Warburg** coefficient.  
-Cell parameter estimation is performed using **Least Squares Estimation** in MATLAB to estimate the cell parameters from simulated impedance measurements, based on an 
+We simulate Electrochemical Impedance Spectroscopy (EIS) for a cell using the **Randles Cell Model**, and extend it to include the **Randle Cell Model with Warburg impedance**.  
+Cell parameter estimation is performed using **Least Squares Estimation** in MATLAB to estimate the cell parameters from simulated impedance measurements. Here we are blind to the parameters of the model but have the model structure and impedance measurements.
+We also explore practical considerations of implementing Nelder-Mead, and data representation.
 
 
 ## Aim
@@ -85,7 +86,7 @@ We plot real vs complex impedance , and bode plot of magnitude and phase compone
 Simulate Electrochemical Impedance Spectroscopy (EIS) data using the Randle Cell model with Warburg impedance. We use a freqeuncy sweep from 0.1 to 10khz AC stimulus and impedance measurement (10 measurements logspace spread).
 Define true values for the model parameters: Rs (Solution Resistance), Rp (Polarization Resistance), Cdl (Double Layer Capacitance), and sigma (Warburg Coefficient).
 Generate noisy simulated impedance data for fitting. This is done on purpose, measurements arent ever perfect.
-Use Least Squares Fitting (via fminsearch) to estimate the model parameters by minimizing the difference between noisy data and model predictions.
+Use Least Squares Fitting (via fminsearch) to estimate the model parameters by minimizing the difference between noisy data and model predictions. We start with an initial guess. The aim is to iterative improve on the initial guess until we reach close to the true values.
 The estimation process adjusts the parameters to best match the simulated data.
 Output estimated values for Rs, Rp, Cdl, and sigma after optimization.
 
@@ -133,11 +134,95 @@ Note: The Code automatically accepts capacitance to be in uF. This is done so th
 12:42:02.752 -> Estimated Parameters:
 12:42:02.752 -> Param 0: 19.84
 12:42:02.752 -> Param 1: 251.20
-12:42:02.752 -> Param 2: 40.19
+12:42:02.752 -> Param 2: 40.19 ->> This is the capacitance in uF , more info on this in practical considerations.
 12:42:02.752 -> Param 3: 149.16
 12:42:02.752 -> Nelder-Mead optimization took: 41 milliseconds
 ```
+The ESP32 take 41 milliseconds to run the optimization and estimate parameters. 
 
-## Acknowledgments
+## Practical Considerations for Nelder-Mead
 
-This project heavily leveraged AI-powered tools, such as ChatGPT, to assist with various aspects, including technical explanations, code optimization, and troubleshooting. The AI assistants were used to enhance the development process, offering insights and refining solutions to improve efficiency and accuracy. The assistance provided was crucial in enhancing the quality of the documentation and coding strategies.
+### Data Magnitude Challenge in Optimization
+When the code and optimization from MATLAB was blind/limited replicated into Embedded C, we faced a problem. The result would be completely wrong ( or program would get stuck somewhere : yet to be investigated).
+If we look at this code section for the creation of the starting simplexs for NelderMead
+
+'''
+// Perform the Nelder-Mead optimization
+void nelderMeadOptimization(float *start, int n, int max_iter, float tol) {
+    const float alpha = 1.0;    // Reflection coefficient
+    const float gamma = 2.0;    // Expansion coefficient
+    const float rho = 0.5;      // Contraction coefficient
+    const float sigma = 0.5;    // Shrink coefficient
+
+    float simplex[n+1][n];
+    float f_values[n+1];
+
+    // Initialize simplex points and their function values
+    for (int i = 0; i <= n; i++) {
+        for (int j = 0; j < n; j++) {
+            simplex[i][j] = start[j];
+        }
+        if (i > 0) {
+            simplex[i][i-1] = start[i-1] * 1.05; // Perturbation to form the simplex
+        }
+        f_values[i] = objectiveFunction(simplex[i]);
+    }
+    ....... remaining optimization code
+'''
+
+We see that given N parameters (from the inital guess), we create N+1 points in an N dimensional space. A 5% pertubation (value * 1.05 ) is applied to each point to create diversity in the cost/objective function.
+For example, let's say that our inital Guess is 1,1,1,1
+The points in the simples will be as follows :
+'''
+1.00,1.00,1.00,1.00
+1.05,1.00,1.00,1.00
+1.00,1.05,1.00,1.00
+1.00,1.00,1.05,1.00
+1.00,1.00,1.00,1.05
+'''
+
+When the inital guesses have numerical values in a similar order of magnitude, the reflect,extend,contract,shrink operations occur effectively.
+But if one parameter in our starting guess is really small like 20e-6 , which is our inital capacitance guess. This causes the algorithm's geometric operations (reflection, expansion, contraction, shrink) to be ineffective, as the scale of changes does not appropriately affect the objective function.
+The simplex may not explore the search space effectively and the Optimization steps may lead to poor convergence or incorrect estimates.
+#### Solution
+Therefore, to make the parameter magnitudes similar in scale, we mode the uF scaling to the impedance calculation, so the results are unchanged, but the geometric operations are carried out better.
+
+### Parameter diversity in Objective Function
+
+It is crucial that each of the parameters being optimised for uniquely affect the cost function. 
+For example let's say that we have 2 resistances in series 3 ohm and 7 ohm, total is 10ohm.
+If our intial guess was 5 ohm and 5 ohm, we reach the desired 10 ohm total, but don't converge to the actual true parameters.
+
+In the Randles Warburg cell model each parameter Rs,Rp,Cdl,and Zw combined are able to produce sufficiently unique changes in the object function, and therefore can be estimated effetively.
+Including a freqeuncy sweep and analyzing both real and complex values of impedance over the sweep for the residual greatly aids this.
+
+Rs: Dominates the high-frequency real part of impedance.
+Rp: Affects both real and imaginary parts at mid-range frequencies.
+Cdl: Impacts the low-frequency imaginary part.
+sigma/Zw: Influences impedance over a range of frequencies due to ion diffusion effects.
+
+'''
+// Objective function to minimize
+float objectiveFunction(float *params) {
+    float Rs = params[0];
+    float Rp = params[1];
+    float Cdl = params[2];
+    float sigma = params[3];
+    
+    Complex Z_model[num_points];
+    calculateImpedance(Rs, Rp, Cdl, sigma, Z_model);
+
+    float residual = 0.0;
+    // Sweep over muliple frequencies for diversity
+    for (int i = 0; i < num_points; i++) {
+        float real_residual = Z_real_noisy[i] - Z_model[i].real();
+        float imag_residual = Z_imag_noisy[i] - Z_model[i].imag();
+        residual += real_residual * real_residual + imag_residual * imag_residual;
+    }
+    return residual;
+'''
+
+
+## Acknowledgments and Notes
+
+This project heavily leveraged AI-powered tools, such as ChatGPT, to assist with various aspects, including technical explanations and code optimization. The assistance provided was crucial in improving development time and implementation. As engineers, we steer the boat. We can see from the practical considerations section that tools will guide and assist, but the responsibility for critical thinking and problem solving rests with us.
