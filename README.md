@@ -123,12 +123,13 @@ Note: The Code automatically accepts capacitance to be in uF. This is done so th
 12:42:02.752 -> Param 3: 149.16  
 12:42:02.752 -> Nelder-Mead optimization took: 41 milliseconds  
 ```
-The ESP32 takes 41 milliseconds to run the optimization and estimate parameters.   
+The ESP32 takes 41 milliseconds to run the optimization and estimate parameters. 
+I have had to allocate 16k stack to the task, which is a lot.( That is something to look into )
 
 ## Practical Considerations for Nelder-Mead  
 
 ### Data Magnitude Challenge in Optimization  
-When the code and optimization from MATLAB was blindy replicated into Embedded C, we faced problems. The result would be completely wrong or the program would get stuck somewhere (yet to be investigated).  
+When the code and optimization from MATLAB was blindy replicated into Embedded C, I faced problems. The result would be completely wrong or the program would get stuck somewhere (yet to be investigated).  
 If we look at this code section for the creation of the starting simplex for NelderMead  
 
 ```
@@ -211,4 +212,5 @@ float objectiveFunction(float *params) {
 
 ## Acknowledgments
 
-This project leveraged AI-powered tools, such as ChatGPT for generation of code and documentation. The assistance provided was crucial in improving development time and implementation.
+This project leveraged AI-powered tools, such as ChatGPT for generation of bolilerplate code and documentation. The assistance provided was crucial in improving development time and implementation.  
+AI Tools may guide and assist, but the resposibility of critical thinking and problem solving is ours.
