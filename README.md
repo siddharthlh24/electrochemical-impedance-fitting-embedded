@@ -58,7 +58,7 @@ We simulate impedance values referencing cell parameter using a simple Randles m
 
 Rs = 20 ohm  
 Rp = 250 ohm  
-Cdl = 40 uF / 40e-6 Farad
+Cdl = 40 uF / 40e-6 Farad  
 sigma = 150 ( Warburg coeff.)  
 
 I have tried to match result in reference : https://www.gamry.com/application-notes/EIS/basics-of-electrochemical-impedance-spectroscopy/  
