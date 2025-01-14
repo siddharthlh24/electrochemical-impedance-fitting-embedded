@@ -40,9 +40,6 @@ $$
 Where:
 - \( \sigma \) is the Warburg coefficient.
 - \( \omega \) is the angular frequency, \( \omega = 2 \pi f \).
-- \( f \) is the frequency.
-
-Real-life simulations use a finite Warburg impedance that depends on the geometry of the cell and other factors. For our purposes, the infinite model is enough as we are not aiming to create a very accurate model, but rather focus on estimating the parameters of the model we choose, and the optimization itself.
 
 Real life simulation uses warberg finite impedance and depends on the geommetry of the cell and other factors. For our purposes, the infinite model is enough as we are not aiming to create a very accurate model, but rather focus on estimating the parameters of the model we choose, and the optimization itself.  
 
