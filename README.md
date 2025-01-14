@@ -41,7 +41,7 @@ Where:
 - Sigma is the Warburg coefficient.
 - Omega/w is the angular frequency, \( \omega = 2 \pi f \).
 
-Real life simulation uses warberg finite impedance and depends on the geommetry of the cell and other factors. For our purposes, the infinite model is enough as we are not aiming to create a very accurate model, but rather focus on estimating the parameters of the model we choose, and the optimization itself.  
+Real life simulation uses Warburg finite impedance and depends on the geommetry of the cell and other factors. For our purposes, the infinite model is enough as we are not aiming to create a very accurate model, but rather focus on estimating the parameters of the model we choose, and the optimization itself.  
 
 ## Modelled Parameters and Physical Interpretation  
 
@@ -54,15 +54,15 @@ Real life simulation uses warberg finite impedance and depends on the geommetry 
 
 
 ## Matlab Simulation  
-We simulate impedance values referencing cell parameter using a simple Randles model ( No Warberg ), and then including Warberg impedance. We will later use the simulated impedance results to back estimate the true parameters given below  
+We simulate impedance values referencing cell parameter using a simple Randles model ( No Warburg ), and then including Warburg impedance. We will later use the simulated impedance results to back estimate the true parameters given below  
 
 Rs = 20 ohm  
 Rp = 250 ohm  
 Cdl = 40 uF / 40e-6 Farad
-sigma = 150 ( warberg coeff.)  
+sigma = 150 ( Warburg coeff.)  
 
 I have tried to match result in reference : https://www.gamry.com/application-notes/EIS/basics-of-electrochemical-impedance-spectroscopy/  
-We plot real vs complex impedance , and bode plot of magnitude and phase components of impedance vs freqency. The Warberg model does not match up exactly as the reference, but that is fine at this point in time.  
+We plot real vs complex impedance , and bode plot of magnitude and phase components of impedance vs freqency. The Warburg model does not match up exactly as the reference, but that is fine at this point in time.  
 
 ### Simplified model  
 [RANDLES SIMPLE CODE MATLAB](randles_simplified_model.m)  
