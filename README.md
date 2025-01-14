@@ -70,15 +70,16 @@ Cdl = 40 uF
 sigma = 150 ( warberg coeff.)
 
 I have tried to match result in reference : https://www.gamry.com/application-notes/EIS/basics-of-electrochemical-impedance-spectroscopy/
-We plot real vs complex impedance , and bode plot of real and imaginary components of impedance vs freqency. The Warberg model does not match up exactly as the referece, because I think refernce uses finite Warburg impedance instead of infinite. That is fine at this point in time.
+We plot real vs complex impedance , and bode plot of magnitude and phase components of impedance vs freqency. The Warberg model does not match up exactly as the reference, because I think refernce uses finite Warburg impedance instead of infinite. That is fine at this point in time.
 
-### Simplifed model
+### Simplified model
 [RANDLES SIMPLE CODE MATLAB](randles_simplified_model.m)
-![Simplifed model](media/randles_simple_impedance.png)
+<img src="media/randles_simple_impedance.png" width="1000"/>
 
 ### Randles with Warberg
 [WARBERG ADDED CODE MATLAB](randles_with_warberg.m)
-![Randles with Warberg](media/randles_warberg_impedance.png)
+<img src="media/randles_warberg_impedance.png" width="1000"/>
+
 
 ## Cell parameter estimation
 Simulate Electrochemical Impedance Spectroscopy (EIS) data using the Randle Cell model with Warburg impedance. We use a freqeuncy sweep from 0.1 to 10khz AC stimulus and impedance measurement (10 measurements logspace spread).
