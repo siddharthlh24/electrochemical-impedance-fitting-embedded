@@ -158,7 +158,7 @@ void nelderMeadOptimization(float *start, int n, int max_iter, float tol) {
 
 We see that given N parameters (from the inital guess), we create N+1 points in an N dimensional space. A 5% pertubation (value * 1.05 ) is applied to each point to create diversity in the cost/objective function.  
 For example, let's say that our inital Guess is 1,1,1,1  
-The points in the simples will be as follows :  
+The points in the simplex will be as follows :  
 ```
 1.00,1.00,1.00,1.00  
 1.05,1.00,1.00,1.00  
