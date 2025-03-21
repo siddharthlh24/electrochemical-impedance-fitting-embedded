@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "Complex.h"
+# include <math.h>
 
 // Constants and initial conditions
 const float Rs_true = 20.0;
@@ -8,8 +9,8 @@ const float Cdl_true = 40;  // nothe that this is micro farads ( the impedance c
 const float sigma_true = 150.0;
 float initial_guess[] = {10.0, 150.0, 60, 100.0};
 const int num_points = 10;
-const int max_iterations = 200;
-const float tol = 1e-6;
+const int max_iterations = 500;
+const float tol = 1e-6; // note that this is one unit of tolerance for +- 1 variance in points on the simplex estimate i.e 150 ohms can 151/149 ohm, 40uF can be 39/41uF and so on. Please check initial guess for starting values.
 
 float freq[num_points];
 float omega[num_points];
@@ -31,7 +32,7 @@ void generateLogspace(float start, float end, int num, float *arr) {
 void calculateImpedance(float Rs, float Rp, float Cdl, float sigma, Complex *Z_total) {
     for (int i = 0; i < num_points; i++) {
         Complex Z_Rs(Rs, 0);
-        Complex Z_Cdl(0, -1 / (omega[i] * Cdl * 1e-6));
+        Complex Z_Cdl(0, -1 / (max((double)(omega[i]),(double) 1e-12) * Cdl * 1e-6)); // avoid divide by zero
         Complex Z_W(0, sigma * sqrt(omega[i]));
         Complex Z_Rp(Rp, 0);
         Z_Rp = Z_Rp + Z_W;
@@ -76,6 +77,7 @@ void nelderMeadOptimization(float *start, int n, int max_iter, float tol) {
     const float gamma = 2.0;    // Expansion coefficient
     const float rho = 0.5;      // Contraction coefficient
     const float sigma = 0.5;    // Shrink coefficient
+    bool isConverged = false;
 
     float simplex[n+1][n];
     float f_values[n+1];
@@ -186,8 +188,16 @@ void nelderMeadOptimization(float *start, int n, int max_iter, float tol) {
             Serial.print("Reached convergence in ");
             Serial.print(iter);
             Serial.println("iterations");
+            isConverged = true;
             break;
         }
+    }
+
+    if(isConverged == false)
+    {
+      Serial.print(" !!! FAILED TO CONVERGE !! in ");
+      Serial.print(max_iter);
+      Serial.println("iterations");
     }
 
     // Print the estimated parameters
@@ -198,6 +208,7 @@ void nelderMeadOptimization(float *start, int n, int max_iter, float tol) {
         Serial.print(": ");
         Serial.println(simplex[0][j]);
     }
+
 }
 
 void optimizationTask(void *pvParameters) {
@@ -237,7 +248,8 @@ void optimizationTask(void *pvParameters) {
     Serial.print(duration);  // Duration in milliseconds
     Serial.println(" milliseconds");
 
-    vTaskDelete(NULL);
+    Serial.println("Entering Deep Sleep...");
+    esp_deep_sleep_start();
 }
 
 
@@ -256,6 +268,7 @@ void setup() {
         1                       // Core to run the task on (0 or 1)
     );
     Serial.println("Optimization task created!");
+    vTaskDelete(NULL);
 }
 
 void loop() {

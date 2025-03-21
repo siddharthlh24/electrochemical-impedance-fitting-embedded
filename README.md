@@ -129,7 +129,7 @@ I have had to allocate 16k stack to the task, which is a lot.( That is something
 ## Practical Considerations for Nelder-Mead  
 
 ### Data Magnitude Challenge in Optimization  
-When the code and optimization from MATLAB was blindy replicated into Embedded C, I faced problems. The result would be completely wrong or the program would get stuck somewhere (yet to be investigated).  
+When the code and optimization from MATLAB was blindy replicated into Embedded C, I faced problems. The result would be completely wrong or the program would get stuck somewhere (has now been fixed).  
 If we look at this code section for the creation of the starting simplex for NelderMead  
 
 ```
