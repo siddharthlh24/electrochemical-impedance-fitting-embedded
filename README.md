@@ -123,7 +123,7 @@ Note: The Code automatically accepts capacitance to be in uF. This is done so th
 12:42:02.752 -> Param 3: 149.16  
 12:42:02.752 -> Nelder-Mead optimization took: 41 milliseconds  
 ```
-The ESP32 takes 41 milliseconds to run the optimization and estimate parameters. 
+The ESP32 takes 41 milliseconds to run the optimization and estimate parameters. (update: after a few changes i now see about 23ms, but this will change depending on how may iterations we see )
 I have had to allocate 16k stack to the task, which is a lot.( That is something to look into )
 
 ## Practical Considerations for Nelder-Mead  
